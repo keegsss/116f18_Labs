@@ -1,0 +1,289 @@
+#+TITLE: Lab 01: Hello World, Basic I/O and Vectors
+
+
+* Overview
+
+This lab covers an introduction to the development environment and exercises involving the ~std::vector~ type and basic input and output (I/O).
+
+* Lab Environment
+
+When you log in to the lab machines in ECS 258, your personal files are available on the H: drive. All files saved on this drive will be maintained
+on department servers and available from any lab in ECS. *Files saved elsewhere (including the desktop) will be deleted at regular intervals*.
+
+You are responsible for managing your own files, but we suggest creating a ~CSC116~ folder on your H: drive, then creating a separate folder for
+each lab session (e.g. ~H:\CSC116\Lab01~).
+
+The lectures and labs for this course will mostly use a stripped-down development environment, consisting
+of a text editor and a command window. You are welcome to use a more advanced development environment (such as CLion or Visual Studio).
+
+On the lab machines, we recommend either the Notepad++ or Atom editors. On Macs, either Sublime Text or Atom are good choices.
+
+In the Windows file browser, if you hold the ~Shift~ key and right-click on the background of a file window, you can use the "Open Command Prompt Here"
+option to open a terminal window in the current directory (and therefore avoid having to use directory navigation commands like ~cd~).
+
+* Part 1: Hello World
+
+A complete "Hello World" program in modern C++ is given by the code below.
+
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+
+int main(){
+	std::cout << "Hello World" << std::endl;
+	return 0;
+}
+#+END_SRC
+
+Copy and paste the code above into a text editor and save the file as ~HelloWorld.cpp~ (if you follow our advice from the 
+previous section, the full path of your file will be something like "H:\CSC116\Lab01\HelloWorld.cpp").
+
+Open a command window in the same directory as your saved ~HelloWorld.cpp~. To compile the program, run the command
+#+BEGIN_EXAMPLE
+g++ -Wall -std=c++17 -o HelloWorld HelloWorld.cpp
+#+END_EXAMPLE
+Any program you write for assignments or labs in this course must be compiled using this command; only two parts of the command will change:
+- the name of the source file i.e. file to be compiled (~HelloWorld.cpp~ above)
+- the name of the executable file i.e. program to be run (~HelloWorld~ above, arbitrarily chosen)
+
+The ~std~ parameter instructs the compiler to use the C++17 standard. The ~Wall~ parameter enables all warning messages.
+
+If compilation is successful, the compiler will produce no output (generally, the only output produced by the compiler consists of warnings or errors).
+
+You can run your program by typing its name ~HelloWorld~ at the command prompt. Note that on Mac (and Linux) machines, running a program in the current
+directory uses the notation ~./HelloWorld~ instead of just ~HelloWorld~.
+
+* Part 2: Basic input with ~std::cin~
+
+The program below reads a single number (of type ~int~) from the user and prints it out.
+
+
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+
+int main(){
+	int i {};
+	std::cout << "Enter a number:" << std::endl;
+	std::cin >> i;
+	std::cout << "You entered " << i << std::endl;
+	return 0;
+}
+#+END_SRC
+
+Put the code above in a file called ~ReadNumber.cpp~ and verify that it compiles and runs successfully.
+
+*Observation*: The program has no facility to detect invalid input (e.g. users entering a string of text instead of a number). 
+
+*Experiment*: What happens to the value of ~i~ when invalid input is provided? Could the resulting value be used to detect invalid inputs?
+
+** Three patterns for detecting invalid inputs
+The three programs below demonstrate different (but completely equivalent) ways to test whether an input operation failed. Notice that
+all three operations use ~std::cin~ for the test (and not the variable ~i~ that was used to store the input).
+
+
+*** Pattern 1
+The expression ~std::cin.fail()~ evaluates to a boolean (true or false) value. After a failed operation, ~std::cin.fail()~ will return ~true~.
+We can therefore use ~std::cin.fail()~ in an ~if~ statement to validate our input.
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+
+int main(){
+	int i {};
+	std::cout << "Enter a number:" << std::endl;
+	std::cin >> i;
+	if (std::cin.fail()){
+		std::cout << "Input was invalid." << std::endl;
+	}else{
+		std::cout << "You entered " << i << std::endl;
+	}
+	return 0;
+}
+#+END_SRC
+
+
+*** Pattern 2
+The input stream ~std::cin~ itself can be treated as a boolean value (and will be equivalent to ~true~ whenever a valid operation has taken
+place, and equivalent to ~false~ after an invalid operation).
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+
+int main(){
+	int i {};
+	std::cout << "Enter a number:" << std::endl;
+	std::cin >> i;
+	if (std::cin){
+		std::cout << "You entered " << i << std::endl;
+	}else{
+		std::cout << "Input was invalid." << std::endl;
+	}
+	return 0;
+}
+#+END_SRC
+
+*** Pattern 3
+Finally, the input operation returns a boolean result, which is ~true~ if the operation succeeded and false otherwise. This allows
+a convenient shorthand for Pattern 2.
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+
+int main(){
+	int i {};
+	std::cout << "Enter a number:" << std::endl;
+	if (std::cin >> i){
+		std::cout << "You entered " << i << std::endl;
+	}else{
+		std::cout << "Input was invalid." << std::endl;
+	}
+	return 0;
+}
+#+END_SRC
+
+** Computing a Sum of Numerical Input
+
+*Exercise 1*: Write a C++ program which repeatedly prompts the user for numbers (in a manner similar to the examples above) until the
+user enters some non-numerical data (which would qualify as "invalid input" in the previous sections). After non-numerical data
+is entered, the program prints the following pieces of information, then terminates.
+ - The number of values entered (not including the invalid input).
+ - The sum of all numerical values entered.
+
+An example run of a successful solution appears below.
+#+BEGIN_EXAMPLE
+Enter a number:
+6
+Enter a number:
+10
+Enter a number:
+17
+Enter a number:
+asdf
+Input was invalid.
+Number of Values Entered: 3
+Sum: 33
+#+END_EXAMPLE
+
+You will probably need a ~while~ loop in your solution.
+
+* Part 3: Vectors
+
+The program below uses ~std::vector~ to store the sequence
+	\[6,\quad 10,\quad 17,\quad 111,\quad 116,\]
+then prints out the elements of the vector in order. The output of the program is shown below the code listing.
+
+#+BEGIN_SRC cpp :results output :exports both
+#include <iostream>
+#include <vector>
+
+int main(){
+	std::vector<int> V {};
+	
+	V.push_back(6);
+	V.push_back(10);
+	V.push_back(17);
+	V.push_back(111);
+	V.push_back(116);
+
+
+	std::cout << "V contains " << V.size() << " elements" << std::endl;
+	std::cout << "Contents: ";
+	for (auto i: V){
+		std::cout << i << " ";
+	}
+	std::cout << std::endl;
+
+	return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: V contains 5 elements
+: Contents: 6 10 17 111 116
+
+** Vectors and Input
+
+*Exercise 2*: Write a program which reads integers from the user until an invalid input is read (as in the previous exercise), then 
+prints out the following information (in the order given)
+ - The number of elements read
+ - A listing of all elements read
+ 
+An example run of a successful solution appears below.
+#+BEGIN_EXAMPLE
+Enter a number:
+6
+Enter a number:
+10
+Enter a number:
+17
+Enter a number:
+asdf
+Input was invalid.
+Number of Values Entered: 3
+Values: 6 10 17
+#+END_EXAMPLE
+
+You should use a loop which reads inputs from the user (as in Exercise 1) and then adds each element to a vector using ~push_back~ to allow
+you to print the set of all elements out at the end.
+
+** Vector element access
+
+The program below demonstrates the ~.at()~ method of ~std::vector~, which can be used to access specific elements of the vector by index.
+The output of the program appears below the code listing.
+
+#+BEGIN_SRC cpp :results output :exports both
+#include <iostream>
+#include <vector>
+
+int main(){
+	std::vector<int> V {};
+	
+	V.push_back(6);
+	V.push_back(10);
+	V.push_back(17);
+	V.push_back(111);
+	V.push_back(116);
+
+
+	std::cout << "The first element of V is " << V.at(0) << std::endl;
+	std::cout << "The last element of V is " << V.at( V.size() - 1 ) << std::endl;
+
+
+	return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: The first element of V is 6
+: The last element of V is 116
+
+*Exercise 3*: Add an extra line of output to the end of your solution to Exercise 2: a listing of all elements entered in *reverse order*. You will
+probably want to use an indexing ~for~ loop which iterates through indices of the vector in descending order (starting at ~V.size() - 1~).
+
+An example run of a successful solution appears below.
+#+BEGIN_EXAMPLE
+Enter a number:
+6
+Enter a number:
+10
+Enter a number:
+17
+Enter a number:
+asdf
+Input was invalid.
+Number of Values Entered: 3
+Values (forwards): 6 10 17
+Values (reverse): 17 10 6
+#+END_EXAMPLE
+
+*Extra Practice*: Modify the code which lists elements to separate all elements by commas (but without a comma after the last element), as in the example below.
+#+BEGIN_EXAMPLE
+Enter a number:
+6
+Enter a number:
+10
+Enter a number:
+17
+Enter a number:
+asdf
+Input was invalid.
+Number of Values Entered: 3
+Values (forwards): 6, 10, 17
+Values (reverse): 17, 10, 6
+#+END_EXAMPLE
