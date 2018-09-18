@@ -1,0 +1,195 @@
+#+TITLE: Lab02: Strings, Vectors and File I/O
+
+
+* Overview
+
+This lab covers using command line parameters, basic File I/O, the use of the ~std::string~ type, and exercises also involving the ~std::vector~ type.
+
+* Part 1: Using command line parameters
+
+When starting a C++ program from the command line we can append input parameters that can be read by the program, as in the following example:
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>sum_ints 2 2 -1
+3
+#+END_EXAMPLE
+
+The source of the program above is shown below.
+
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+#include <vector>
+#include <string>
+
+int main(int argc, char** argv) {
+
+    std::vector< std::string > arguments;
+    for (int i = 1; i < argc; i++){
+        arguments.push_back(argv[i]);
+    }
+
+    int sum{0};
+    for (auto arg: arguments){
+        sum += std::stoi(arg);
+    }
+    std::cout << sum << std::endl;
+    return 0;
+}
+#+END_SRC
+
+The parameters to ~main~ are
+ - The number of arguments ~argc~
+ - An array ~argv~ of C-style strings. Notice that the program above uses a for-loop to convert the array into a vector of ~std::string~ objects (since we do not want to work with C strings). The C-style strings are automatically converted to ~std::string~ when they are added to the vector. Additionally, since ~argv[0]~ is normally set to the name of the program (and not one of the user-entered parameters), the loop only considers arguments starting at index 1.
+
+The ~std::stoi~ takes an ~std::string~ object and attempts to convert it to an integer (which is then returned).
+ 
+* Part 2: Reading a text file
+
+** Part 2-1: Using fstream
+
+The following program opens a text file called ~inputfile.txt~ (if it exists in the directory the program is ran in), and prints out each line of the file.
+
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main(int argc, char** argv ) {
+    std::string filename{"inputfile.txt"};
+    std::ifstream myfile;
+    myfile.open(filename);
+    
+    if(myfile.is_open()) {
+        std::string line{};
+        while( std::getline(myfile,line) ) {
+            std::cout << line << std::endl;
+        }
+        myfile.close();
+    } else {
+        std::cout << "Unable to open file." << std::endl;
+    }
+    return 0;
+}
+#+END_SRC
+
+*Exercise 1*: Modify this program so that the name of the file is given by the first command line parameter.
+Create a text file called ~seashells.txt~, and copy paste the following text (or create your own):
+
+#+BEGIN_EXAMPLE
+sally sells seashells by the seashore 
+she sells seashells on the seashell shore 
+the seashells she sells are seashore shells 
+of that im sure 
+#+END_EXAMPLE
+
+** Part 2-2: Reading from standard input
+
+When running a program from the command line we can *pipe* a file into the standard input stream (stdin), using the following syntax:
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>readStdin < seashells.txt
+#+END_EXAMPLE
+
+The file can then be read from ~std::cin~, as with when we read user input. This gives your program additional flexibility as you may switch between running your program with file input and with user input. 
+The program ~readStdin~ is compiled from the following source:
+
+#+BEGIN_SRC cpp :results output :exports code
+#include <iostream>
+#include <string>
+
+int main()
+{
+    std::string s{};
+    while (std::getline(std::cin, s)) {
+        std::cout << s << std::endl;
+    }
+    return 0;
+}
+#+END_SRC
+
+The above program will run until ~std::cin~ reaches an end-of-input signal.
+When reading a file, this occurs automatically when the end of the file is encountered, 
+and when reading interactively from the user, it occurs when the user enters ~Ctrl+Z~ on a new line by itself (on Windows), or ~Ctrl+D~ (on Mac/Linux systems).
+
+*Exercise 2*: Run the above program, piping ~seashells.txt~ into the standard input stream. Also run it using user input, sending the EOT character when you are done to gracefully terminate the program.
+
+
+* Part 3: String and Vector Exercises
+
+In C++ the ~std::string~ type represents a sequence of characters. 
+For the following exercises we can use the ~std::vector<std::string>~ type to store multiple ~std::string~ objects.
+
+** Printing text lines in reverse order
+*Exercise 3*: Modify the program from Exercise 2 to print the lines from the input file in reverse order, as in the following example:
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>reverseLineOrder < seashells.txt
+of that im sure 
+the seashells she sells are seashore shells  
+she sells seashells on the seashell shore 
+sally sells seashells by the seashore 
+#+END_EXAMPLE
+
+*Hint*:
+
+- Use a vector of strings to keep track of the lines.
+- You do not know how many lines are in the input file, therefore you will need to add elements to the vector using ~push_back~.
+
+*How to use push_back*: 
+
+Given the declaration:
+
+#+BEGIN_SRC C++
+std::vector<std::string> lines {}; // empty vector
+#+END_SRC
+
+One can insert a string ~st~, at the end of this vector, using:
+
+#+BEGIN_SRC C++
+lines.push_back(st);
+#+END_SRC
+
+** Printing a string in reverse order
+
+*Exercise 4*: Reverse the sequence of characters of each ~std::string~ line, in addition to printing the lines in reverse order as in Exercise 2.
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>reverseAll < seashells.txt
+erus mi taht fo
+sllehs erohsaes era slles ehs sllehsaes eht
+erohs llehsaes eht no sllehsaes slles ehs
+erohsaes eht yb sllehsaes slles yllas
+#+END_EXAMPLE
+
+*Hint*: Use ~.at(i)~ to get the i-th character of a ~std::string~, and ~.size()~ to get the number of characters in a string.
+
+** Alliteration 
+/Alliteration/ refers to sequences of two or more consecutive words that all begin with the same letter. For example, "she sells seashells" and "pumpkin pie" are alliterations.
+In the ~seashells.txt~ input file used above, there are five different alliterative phrases: 
+    - "sally sells seashells" (line 1)
+    - "seashore she sells seashells" (lines 1/2)
+    - "seashell shore" (line 2)
+    - "seashells she sells" (line 3)
+    - "seashore shells" (line 3)
+
+*Exercise 5 (extra practice)*: Write a program which reads a file from standard input and prints out the number of alliterative phrases found (including alliterations that cross line boundaries, as described above).
+
+On the ~seashells.txt~ file used in the previous examples, a test run should produce output similar to the following.
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>count_alliteration < seashells.txt
+Number of alliteration occurences: 5
+#+END_EXAMPLE
+
+*Hint*: For this exercise, it's probably a better idea to use the ~>>~ operator than using ~getline~ to read lines/words.
+
+*Exercise 6 (extra practice)*: Modify the program you wrote in exercise 5 to actually print the alliterative sequences it finds, as in the example below.
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab02\>find_alliteration < seashells.txt
+Alliteration 1: sally sells seashells
+Alliteration 2: seashore she sells seashells
+Alliteration 3: seashell shore
+Alliteration 4: seashells she sells
+Alliteration 5: seashore shells
+#+END_EXAMPLE
