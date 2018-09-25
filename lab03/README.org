@@ -37,6 +37,8 @@ familiarize yourself with the requirements of a specific program.
 It examines both files line by line and outputs a set of line removals a insertions 
 constituting the difference between the two files. 
 
+*Note*: On the lab machines and Windows systems, use ~fc~ instead of ~diff~.
+
 Examine the ~diff~ output below for the two following text files.
 #+BEGIN_EXAMPLE
 Today is gonna be the day
@@ -81,7 +83,7 @@ are also provided there. Use these to test your program after each implementatio
 (mean) as follows:
 
 #+BEGIN_EXAMPLE
-H:\CSC116\lab03\>grades < grades.input
+H:\CSC116\lab03\>grades < grades_input.txt
 Read 14 grades
 Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
 Average: 57.7143
@@ -107,7 +109,7 @@ std::sort( V.begin(), V.end() )
 *Exercise 3*: Extend your program to calculate the median of the grades, as follows: 
 
 #+BEGIN_EXAMPLE
-H:\CSC116\lab03\>grades < grades.input
+H:\CSC116\lab03\>grades < grades_input.txt
 Read 14 grades
 Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
 Average: 57.7143
@@ -125,7 +127,7 @@ create a new vector to sort.
 0s, as follows:
 
 #+BEGIN_EXAMPLE
-H:\CSC116\lab03\>grades < grades.input
+H:\CSC116\lab03\>grades < grades_input.txt
 Read 14 grades
 Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
 Average: 57.7143
