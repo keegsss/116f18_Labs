@@ -1,0 +1,153 @@
+#+TITLE: Lab03: Creating Test Cases and More Vector Exercises
+
+* Overview
+
+This lab will cover redirecting the standard output stream ~std::cout~ to a file, 
+and comparing the program's output to our own created test cases using the
+command line tool ~diff~. We will also touch on more ~std::vector~
+exercises.
+
+* Part 1: Piping the Standard Output Stream
+
+In the previous lab we learned how to redirect (or *pipe*) a file into the standard input stream 
+~std::cin~, when running our program from the command line. We can also pipe the 
+standard output stream ~std::cout~ to a file using the following syntax.
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>write_cout > output.txt
+#+END_EXAMPLE
+
+Strings printed using ~std::cout <<~ will now be written to the file, instead of 
+being printed out in our command line. We can combine piping both input and output.
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>write_cout < input.txt > output.txt
+#+END_EXAMPLE
+
+* Part 2: Creating Test Cases, Comparing with diff
+
+Unit testing is an important part of software development, evaluating whether or not 
+a given software component functions correctly and is fit for use. 
+
+Writing test cases for a program, even before the program itself has been written, is 
+an extremely helpful way of catching bugs early in development. It can also help you 
+familiarize yourself with the requirements of a specific program. 
+
+~diff~ is a command line utility that can be used for comparing the two text files. 
+It examines both files line by line and outputs a set of line removals a insertions 
+constituting the difference between the two files. 
+
+Examine the ~diff~ output below for the two following text files.
+#+BEGIN_EXAMPLE
+Today is gonna be the day
+That they're gonna throw it back to you
+By now you should've somehow
+Realized what you gotta do
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+Today is gonna be the day
+That they're gonna thraw it back to you
+By now you should've somehow
+Realized what you gotta do
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>diff file1.txt file2.txt
+2c2
+< That they're gonna throw it back to you
+---
+> That they're gonna thraw it back to you
+#+END_EXAMPLE
+
+To test a given program, we can *pipe* its standard output stream to a text file, then 
+compare the output file to a text file containing the expected results, using ~diff~.
+
+*Exercise 1*: The program ~string_case.cpp~ in the ~resources~ folder counts the number of upper and 
+lower case letters in a given line, and prints the line with upper case letter removed.
+However, it has some bugs. 
+
+Compile and run this program, piping in the provided input ~string_input.txt~ and piping its output to a new text file. Compare its 
+output to the expected solution ~string_expected.txt~ using ~diff~. Use this information to find the bugs.
+
+* Part 3: Another Vector Exercise
+
+For this part we will write a program that calculates various statistics from an input 
+set of grades. Some starter code for your program ~read_grades.cpp~ is in the ~resources~ folder. The 
+following exercises implement each of the blank functions in order.
+
+Text files with a set of input grades, as well as its expected output 
+are also provided there. Use these to test your program after each implementation step.
+
+*Exercise 2*: Write a program that takes in a set of input grades, and outputs the average 
+(mean) as follows:
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>grades < grades.input
+Read 14 grades
+Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
+Average: 57.7143
+Median: 0
+Grades with zeros removed: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
+Average (zeros excluded): 57.7143
+Median (zeros excluded): 0
+
+#+END_EXAMPLE
+
+Then *pipe* its output to a text file, and compare using ~diff~ to ~grades_expected.txt~.
+
+** Sorting a vector
+
+The C++ standard library includes a function ~std::sort~ (available via "#include <algorithm>"), which takes a collection (such as a vector) and sorts part or all
+of its elements. The arguments to ~std::sort~ are the beginning and end of the range to sort, as iterators. To sort all of the
+elements in a vector ~V~, the following call to ~std::sort~ can be used
+
+#+BEGIN_EXAMPLE
+std::sort( V.begin(), V.end() )
+#+END_EXAMPLE
+
+*Exercise 3*: Extend your program to calculate the median of the grades, as follows: 
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>grades < grades.input
+Read 14 grades
+Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
+Average: 57.7143
+Median: 68.5
+Grades with zeros removed: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
+Average (zeros excluded): 57.7143
+Median (zeros excluded): 68.5
+
+#+END_EXAMPLE
+
+*Hint*: First sort your vector of grades. Note the function ~compute_median~ takes in a constant reference to a vector, therefore you must
+create a new vector to sort.
+
+*Exercise 4*: Extend your program again to calculate the mean and median of the grades, excluding 
+0s, as follows:
+
+#+BEGIN_EXAMPLE
+H:\CSC116\lab03\>grades < grades.input
+Read 14 grades
+Original grades: 71 49 92 87 0 66 81 74 0 51 64 94 79 0 
+Average: 57.7143
+Median: 68.5
+Grades with zeros removed: 71 49 92 87 66 81 74 51 64 94 79 
+Average (zeros excluded): 73.4545
+Median (zeros excluded): 74
+
+#+END_EXAMPLE
+
+*Hint*: Create a new vector and ~push_back~ non-zero elements only, then reassign the input reference.
+
+*Extra Practice*: Redo Exercise 4, now using the ~erase~ method described below, instead of creating a new vector.
+
+** Deleting elements of a vector
+
+The ~erase~ method of a vector will remove an element at any position (and move the remaining elements to fill the missing space).
+To remove a single element at index ~i~, a call like the following can be used
+
+#+BEGIN_EXAMPLE
+V.erase( V.begin() + i )
+#+END_EXAMPLE
+
+The argument to ~V.erase()~ must be an iterator, but the provided iterator becomes invalid after the ~erase~ method finishes.
+The notation ~V.begin() + i~ creates a temporary iterator which ceases to exist after the call to ~erase~.
